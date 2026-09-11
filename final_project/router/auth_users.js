@@ -5,25 +5,18 @@ const regd_users = express.Router();
 
 let users = [];
 
-const isValid = (username)=>{ //returns boolean
-//write code to check is the username is valid
-}
+const isValid = (username) => {
+  let userswithsamename = users.filter((user) => user.username === username);
+  return userswithsamename.length > 0;
+};
 
-// Add or modify a book review
-authenticated.put("/auth/review/:isbn", (req, res) => {
-  const isbn = req.params.isbn;
-  const review = req.query.review;
-  const username = req.session.authorization.username;
+const authenticatedUser = (username, password) => {
+  let validusers = users.filter((user) => user.username === username && user.password === password);
+  return validusers.length > 0;
+};
 
-  if (books[isbn]) {
-    books[isbn].reviews[username] = review;
-    return res.status(200).send(`The review for the book with ISBN ${isbn} has been added/updated.`);
-  } else {
-    return res.status(404).json({ message: "Book not found" });
-  }
-});
 // Only registered users can login
-authenticated.post("/login", (req, res) => {
+regd_users.post("/login", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
@@ -40,10 +33,35 @@ authenticated.post("/login", (req, res) => {
   }
 });
 
-// Add a book review
+// Add or modify a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const isbn = req.params.isbn;
+  const review = req.query.review;
+  const username = req.session.authorization.username;
+
+  if (books[isbn]) {
+    books[isbn].reviews[username] = review;
+    return res.status(200).send(`The review for the book with ISBN ${isbn} has been added/updated.`);
+  } else {
+    return res.status(404).json({ message: "Book not found" });
+  }
+});
+
+// Delete a book review (Question 10 handler)
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+  const isbn = req.params.isbn;
+  const username = req.session.authorization.username;
+
+  if (books[isbn]) {
+    if (books[isbn].reviews[username]) {
+      delete books[isbn].reviews[username];
+      return res.status(200).send(`Reviews for the ISBN ${isbn} posted by the user ${username} deleted.`);
+    } else {
+      return res.status(404).json({ message: "No review found for this user to delete" });
+    }
+  } else {
+    return res.status(404).json({ message: "Book not found" });
+  }
 });
 
 module.exports.authenticated = regd_users;
