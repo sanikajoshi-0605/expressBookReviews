@@ -6,19 +6,19 @@ const public_users = express.Router();
 
 
 // Register a new user
-public_users.post("/register", (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-
-  if (!username || !password) {
-    return res.status(404).json({ message: "Unable to register user. Username and password required." });
+// Task 10/11: Get the book list available in the shop using Async/Await
+public_users.get('/', async function (req, res) {
+  try {
+    const getBooks = new Promise((resolve, reject) => {
+      resolve(books);
+    });
+    
+    const bookList = await getBooks;
+    return res.status(200).send(JSON.stringify(bookList, null, 4));
+  } catch (error) {
+    return res.status(500).json({ message: "Error retrieving books", error: error.message });
   }
-
-  const isValid = (username) => {
-    let userswithsamename = users.filter((user) => user.username === username);
-    return userswithsamename.length > 0;
-  };
-
+});
   if (!isValid(username)) {
     users.push({ "username": username, "password": password });
     return res.status(200).json({ message: "User successfully registered. Now you can login" });
