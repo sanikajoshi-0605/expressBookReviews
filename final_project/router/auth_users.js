@@ -9,10 +9,19 @@ const isValid = (username)=>{ //returns boolean
 //write code to check is the username is valid
 }
 
-const authenticatedUser = (username,password)=>{ //returns boolean
-//write code to check if username and password match the one we have in records.
-}
+// Add or modify a book review
+authenticated.put("/auth/review/:isbn", (req, res) => {
+  const isbn = req.params.isbn;
+  const review = req.query.review;
+  const username = req.session.authorization.username;
 
+  if (books[isbn]) {
+    books[isbn].reviews[username] = review;
+    return res.status(200).send(`The review for the book with ISBN ${isbn} has been added/updated.`);
+  } else {
+    return res.status(404).json({ message: "Book not found" });
+  }
+});
 // Only registered users can login
 authenticated.post("/login", (req, res) => {
   const username = req.body.username;
